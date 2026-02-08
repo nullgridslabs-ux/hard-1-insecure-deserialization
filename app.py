@@ -13,6 +13,17 @@ class InternalAuditWorkflow:
     def run(self):
         return FLAG
 
+@app.route("/")
+def index():
+    return """
+<h2>Workflow Import Service</h2>
+<p>Internal automation platform for importing and running workflows.</p>
+<ul>
+<li>POST /api/workflow/import</li>
+<li>GET /health</li>
+</ul>
+"""
+
 @app.route("/health")
 def health():
     return "ok"
@@ -22,7 +33,6 @@ def import_workflow():
     data = json.loads(request.data.decode())
     t = data.get("type")
 
-    # BUG: client controls internal type
     if t == "Workflow":
         w = Workflow()
     elif t == "InternalAuditWorkflow":
@@ -33,4 +43,5 @@ def import_workflow():
     return jsonify({"result": w.run()})
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
